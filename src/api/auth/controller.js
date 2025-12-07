@@ -6,7 +6,7 @@ const { validateEmail, validatePassword } = require('../../services/userservice'
 const login = async (req, res) => {
     const { email, password } = req.body;
     try{
-        const user = await User.findOne(email);
+        const user = await User.findOne({email: email});
         if (!user){
             return  res.status(400).json({
                 message: "Invalid email. Do you want to register?"
@@ -77,15 +77,4 @@ const register = async (req, res) => {
     }
 }
 
-const findUser = async (req, res) => {
-    const userId = req.params.id;
-    try{
-
-    } catch (err){
-        console.error("Error fetching user details", err);
-        res.status(500).json({ 
-            message: "Internal server error" 
-        });
-    }
-}
-module.exports = { login, register, findUser };
+module.exports = { login, register };
