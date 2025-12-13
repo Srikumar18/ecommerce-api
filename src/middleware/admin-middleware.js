@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const adminMiddleware = (req, res, next) => {
     const user = req.userInfo;
-    if (user && user.email === process.env.ADMIN_EMAIL){
+    if (user && user.role === 'admin'){
         next();
     } else {
         return res.status(403).json({
@@ -10,3 +10,5 @@ const adminMiddleware = (req, res, next) => {
         })
     }
 }
+
+module.exports = adminMiddleware;
