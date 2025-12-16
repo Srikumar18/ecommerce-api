@@ -145,4 +145,43 @@ const logout = async (req, res) => {
   }
 };
 
-module.exports = { login, register, refreshToken, logout };
+const resetPassword = async (req, res) => {
+  const userId = req.userInfo.id;
+  const { oldPassword, newPassword } = req.body;
+  try {
+    const user = await User.findById(userId);
+    if (!user){
+      return res.status(404).json({ 
+        message: "User not found" 
+      });
+    }
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch){
+      return res.status(400).json({
+        message: "Incorrect old password. Please try again."
+      })
+    }
+
+    if (!validatePassword(newPassword)){
+      return res.status(400).json({
+        message: "New password must be at least 8 characters long and include at least one uppercase letter, one number, and one special character."
+      })
+    }
+
+    const genSalt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, genSalt);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ 
+      message: "Password reset successfully" 
+    });
+  } catch (err){
+    console.error("Error during password reset", err);
+    res.status(500).json({ 
+      message: "Internal server error" 
+    });
+  }
+}
+
+module.exports = { login, register, refreshToken, logout, resetPassword };
